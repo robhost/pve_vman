@@ -1,0 +1,12 @@
+# syntax: glob
+bin
+build
+dist
+include
+lib
+pve_vman.egg-info
+.tox
+*.egg
+*.py[cod]
+*.swp
+*~
