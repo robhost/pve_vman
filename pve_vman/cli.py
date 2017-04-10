@@ -33,6 +33,11 @@ VERBOSITY = 0
 """Verbosity level"""
 
 
+class _VerbosityAction(argparse._CountAction):
+    def __call__(self, parser, namespace, values, option_string=None):
+        global VERBOSITY
+        VERBOSITY += 1
+
 def debug1(msg):
     """Debug message level 1."""
     if VERBOSITY > 0:
@@ -106,8 +111,7 @@ def command_balance(parser, input_args):
     """Migrate VMs in order to achieve a memeory balanced state."""
     parser.add_argument(
         '-v', '--verbose',
-        dest='verbosity',
-        action='count',
+        action=_VerbosityAction,
         help='increase verbosity level, can be used multiple times'
         )
     parser.add_argument(
@@ -132,8 +136,7 @@ def command_flush(parser, input_args):
     """Migrate all migrateable VMs off the given Node."""
     parser.add_argument(
         '-v', '--verbose',
-        dest='verbosity',
-        action='count',
+        action=_VerbosityAction,
         help='increase verbosity level, can be used multiple times'
         )
     parser.add_argument(
