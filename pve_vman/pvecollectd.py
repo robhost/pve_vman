@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 #  Copyright (c) 2017 RobHost GmbH <support@robhost.de>
@@ -19,9 +20,26 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 #  USA
 
+
+import socket
 import traceback
 
 import collectd
+
+from pve_vman import pvestats, pveqemumonitor
+
+
+plugin_metrics = dict(
+    PVE_VM_Net_Bytes = dict(
+        if_octets = ('netin', 'netout')
+    ),
+    PVE_VM_Disk_Bytes = dict(
+        disk_octets = ('diskread', 'diskwrite')
+    ),
+    PVE_VM_Disk_IOPS = dict(
+        disk_ops = ('diskrops', 'diskwops')
+    )
+)
 
 
 def dispatch(plugin, plugin_instance, type, type_instance, values,
@@ -49,3 +67,25 @@ def dispatch(plugin, plugin_instance, type, type_instance, values,
         collectd.error("%s: failed to dispatch values :: %s :: %s"
                 % (plugin, exc, traceback.format_exc()))
 
+
+def readstats():
+    cluster = pvestats.buildcluster()
+    hostname = socket.gethostname()
+    node = cluster[hostname]
+
+    for vm in node.vms(lambda c: c.status == 'running'):
+        if vm.type == 'qemu':
+            blockstat = pveqemumonitor.query_blockstats(vm.vmid)
+            vm.diskrops = sum([d['stats']['rd_operations'] for d in blockstat])
+            vm.diskwops = sum([d['stats']['wr_operations'] for d in blockstat])
+        for plugin, metrics in plugin_metrics.items():
+            for metric, attrs in metrics.items():
+                try:
+                    values = [getattr(vm, attr) for attr in attrs]
+                except AttributeError:
+                    continue
+                instance = "VM_%s" % vm.vmid
+                dispatch(plugin, instance, metric, None, values)
+
+
+collectd.register_read(readstats)

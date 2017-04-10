@@ -29,6 +29,12 @@ import re
 
 from pve_vman import pvesh, pvefiles
 
+# python 2 and 3.4 compat
+try:
+    basestring
+except NameError:
+    basestring = str
+
 
 @functools.total_ordering
 class PVEStatObject(object):
@@ -86,7 +92,7 @@ class PVEStatContainer(object):
 
     def __getitem__(self, key):
         for child in self.children:
-            if isinstance(key, str):
+            if isinstance(key, basestring):
                 if child.id == key:
                     return child
             elif child == key:
