@@ -25,8 +25,12 @@
 
 import argparse
 import sys
+import glob
+import time
+import signal
+import os
 
-from pve_vman import pvestats, pvecluster
+from pve_vman import pvestats, pvecluster, pvevmiostats
 
 
 VERBOSITY = 0
@@ -53,6 +57,12 @@ def __debug_print(msg, prefix='DEBUG'):
     for line in str(msg).splitlines():
         print('{}: {}\033[0m'.format(prefix, line))
 
+def __int_fmt(num):
+    for unit in ['','K','M','G','T','P']:
+        if abs(num) < 10000:
+            return "%d%s" % (num, unit)
+        num /= 1000
+    return num
 
 def print_state(cluster):
     """Format and print the given cluster object."""
@@ -104,6 +114,43 @@ def exec_migrate(cluster, newcluster, args):
         debug1(out.stdout)
         if out.returncode != 0:
             raise Exception('migration returncode != 0')
+
+def print_vmiostat(interval=1, count=0, limit=0, totals=False, ssum=False):
+    """Print the throughput per VM. Default is to print a line per VM
+    and an additional line for the totals. I fno count is given, it runs
+    indefinitely until SIGINT is received else it runs count times and then
+    terminates.
+    """
+    def signal_handler(signal, frame):
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
+
+    if not totals and count > 0:
+        count += 1
+
+    fmt = '{:10} {:>15} {:>15} {:>15} {:>15}'
+    keys = pvevmiostats.VMIOStats.keys
+    int_fmt = lambda l: [__int_fmt(l[k]) for k in keys]
+    vmstats = pvevmiostats.VMIOStats(interval)
+
+    i = 0
+    while count == 0 or i < count:
+        i += 1
+        (vmdiffs, vmsums) = vmstats.fetch()
+
+        if i > 1 or totals:
+            print(fmt.format('VM-ID', *keys))
+
+            if not ssum:
+                for vm, diffs in sorted(vmdiffs.items()):
+                    if limit == 0 or limit == int(vm):
+                        print(fmt.format(vm, *int_fmt(diffs)))
+
+            print(fmt.format('total', *int_fmt(vmsums)))
+
+        time.sleep(interval)
+        print("")
 
 
 def command_balance(parser, input_args):
@@ -168,6 +215,43 @@ def command_status(parser, input_args):
     cluster.freeze()
     print_state(cluster)
 
+def command_vmiostat(parser, input_args):
+    """Print IO stats per VM and sum."""
+    def over_zero(value):
+        ivalue = int(value)
+        if ivalue < 1:
+            raise argparse.ArgumentTypeError("%s must be 1 or higher" % value)
+        return ivalue
+
+    parser.add_argument(
+            '-i', '--interval',
+            type=over_zero,
+            default=1,
+            help='interval of output (>0)')
+    parser.add_argument(
+            '-c', '--count',
+            type=int,
+            default=0,
+            help='number of iterations (0 = infinite)')
+    parser.add_argument(
+            '-l', '--limit',
+            type=int,
+            default=0,
+            help='only show stats of VM with this id (0 = all)')
+    parser.add_argument(
+            '-t', '--totals',
+            action='store_true',
+            help='show inital totals')
+    parser.add_argument(
+            '-s', '--sum',
+            dest='ssum',
+            action='store_true',
+            help='show summary only')
+
+    args = parser.parse_args(input_args)
+
+    print_vmiostat(**dict(args._get_kwargs()))
+
 
 def cli():
     """Parse arguments and call matching handler."""
@@ -189,6 +273,10 @@ def cli():
             'status',
             add_help=False,
             help='show the current cluster status')
+    subparsers.add_parser(
+            'vmiostat',
+            add_help=False,
+            help='print IO stats for VMs')
 
     args, exceding_args = parser.parse_known_args()
 

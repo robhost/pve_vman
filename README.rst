@@ -55,3 +55,8 @@ steps, don't execute::
 Run a flush, but only consider VMs that have HA enabled::
 
     vman flush --onlyha pvenode02
+
+Show VM iostats. This works kinda like iostat or vmstat and runs
+continuously, if no --count is given. Terminate with SIGINT (CTRL+C)::
+
+    vman vmiostat
