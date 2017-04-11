@@ -1,5 +1,4 @@
-PVE-vman
-========
+# PVE-vman
 
 RobHost GmbH [support@robhost.de], 2017
 
@@ -8,8 +7,7 @@ License: GPLv2+
 PLEASE NOTE THAT THIS SOFTWARE COMES WITH ABSOLUTELY NO WARRANTY!
 
 
-What is it good for?
---------------------
+## What is it good for?
 
 Handling a lot of VMs on a PVE cluster can be tedious. VMs might be
 unevenly distributed across nodes or imagine you want to due maintanace
@@ -21,42 +19,49 @@ migratebale VMs off a given node or balance VMs across all nodes based
 on the memory used by the VMs.
 
 
-Requirements
-------------
+## Requirements
 
-- Proxmox VE cluster 4
-- Access to pvesh tool
-
-
-Installation
-------------
-
-::
-
-    python setup.py install
+* Proxmox VE cluster 4
+* Access to pvesh tool
 
 
-Usage
------
+## Installation
 
-Print current cluster status::
+```
+python setup.py install
+```
 
-    vman status
+## Usage
 
-Balance VMs across all nodes::
+Print current cluster status:
 
-    vman balance
+```
+vman status
+```
+
+Balance VMs across all nodes:
+
+```
+vman balance
+```
 
 Migrate all migrateable VMs off a node, but only calculate necessary
-steps, don't execute::
+steps, don't execute:
 
-    vman flush --noexec pvenode03
+```
+vman flush --noexec pvenode03
+```
 
-Run a flush, but only consider VMs that have HA enabled::
+Run a flush, but only consider VMs that have HA enabled:
 
-    vman flush --onlyha pvenode02
+```
+vman flush --onlyha pvenode02
+```
 
 Show VM iostats. This works kinda like iostat or vmstat and runs
-continuously, if no --count is given. Terminate with SIGINT (CTRL+C)::
+continuously, if no --count is given. Terminate with SIGINT (CTRL+C):
 
-    vman vmiostat
+```
+vman vmiostat
+```
+
