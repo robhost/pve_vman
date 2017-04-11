@@ -95,9 +95,11 @@ class PVESH(object):
 
         return self
 
-    def __nonzero__(self):
+    def __bool__(self):
         """Return if the object is considered OK or failed."""
         return self.returncode < 1
+
+    __nonzero__ = __bool__
 
 
 def get(pveshpath, **options):
