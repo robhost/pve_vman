@@ -35,12 +35,11 @@ setup(
     keywords="pve proxmox cluster",
     classifiers=dedent("""
         License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)
-        Programming Language :: Python :: 3
-        Programming Language :: Python :: 3.4
+        Programming Language :: Python :: 2
+        Programming Language :: Python :: 2.7
         Topic :: System :: Systems Administration
         Topic :: Utilities
         """).strip().splitlines(),
-    python_requires='>=3.4',
     packages=find_packages(),
     entry_points={
         'console_scripts': [
