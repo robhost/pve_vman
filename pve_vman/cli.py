@@ -67,8 +67,7 @@ def print_state(cluster):
             node.memvmprovisioned_gb,
             len(node.children),
             len(node.vms(lambda c: c.ha)),
-            len(node.vms(lambda c: c.migrateable))
-            )
+            len(node.vms(lambda c: c.migrateable)))
 
         print(line)
 
@@ -110,20 +109,17 @@ def exec_migrate(cluster, newcluster, args):
 def command_balance(parser, input_args):
     """Migrate VMs in order to achieve a memeory balanced state."""
     parser.add_argument(
-        '-v', '--verbose',
-        action=_VerbosityAction,
-        help='increase verbosity level, can be used multiple times'
-        )
+            '-v', '--verbose',
+            action=_VerbosityAction,
+            help='increase verbosity level, can be used multiple times')
     parser.add_argument(
-        '-n', '--noexec',
-        action='store_true',
-        help='only show, don\'t migrate'
-        )
+            '-n', '--noexec',
+            action='store_true',
+            help='only show, don\'t migrate')
     parser.add_argument(
-        '-c', '--count',
-        type=int,
-        help='number of migrations to run'
-        )
+            '-c', '--count',
+            type=int,
+            help='number of migrations to run')
 
     args = parser.parse_args(input_args)
 
@@ -135,38 +131,32 @@ def command_balance(parser, input_args):
 def command_flush(parser, input_args):
     """Migrate all migrateable VMs off the given Node."""
     parser.add_argument(
-        '-v', '--verbose',
-        action=_VerbosityAction,
-        help='increase verbosity level, can be used multiple times'
-        )
+            '-v', '--verbose',
+            action=_VerbosityAction,
+            help='increase verbosity level, can be used multiple times')
     parser.add_argument(
-        '-n', '--noexec',
-        action='store_true',
-        help='only show, don\'t migrate'
-        )
+            '-n', '--noexec',
+            action='store_true',
+            help='only show, don\'t migrate')
     parser.add_argument(
-        '-c', '--count',
-        type=int,
-        help='number of migrations to run'
-        )
+            '-c', '--count',
+            type=int,
+            help='number of migrations to run')
     parser.add_argument(
-        '-o', '--onlyha',
-        action='store_true',
-        help='only migrate HA managed VMs'
-        )
+            '-o', '--onlyha',
+            action='store_true',
+            help='only migrate HA managed VMs')
     parser.add_argument(
-        'node',
-        help='name of the node to migrate all VMs off'
-        )
+            'node',
+            help='name of the node to migrate all VMs off')
 
     args = parser.parse_args(input_args)
 
     cluster = pvestats.buildcluster()
     newcluster = pvecluster.planflush(
-        node=args.node,
-        onlyha=args.onlyha,
-        cluster=cluster
-        )
+            node=args.node,
+            onlyha=args.onlyha,
+            cluster=cluster)
 
     exec_migrate(cluster, newcluster, args)
 
@@ -184,25 +174,21 @@ def cli():
     parser = argparse.ArgumentParser()
 
     subparsers = parser.add_subparsers(
-        dest='command',
-        title='commands'
-        )
+            dest='command',
+            title='commands')
 
     subparsers.add_parser(
-        'balance',
-        add_help=False,
-        help='migrate VMs to reach an even distribution across nodes'
-        )
+            'balance',
+            add_help=False,
+            help='migrate VMs to reach an even distribution across nodes')
     subparsers.add_parser(
-        'flush',
-        add_help=False,
-        help='migrate VMs from the given node'
-        )
+            'flush',
+            add_help=False,
+            help='migrate VMs from the given node')
     subparsers.add_parser(
-        'status',
-        add_help=False,
-        help='show the current cluster status'
-        )
+            'status',
+            add_help=False,
+            help='show the current cluster status')
 
     args, exceding_args = parser.parse_known_args()
 
