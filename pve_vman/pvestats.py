@@ -329,16 +329,6 @@ class PVEStatNode(PVEStatObject, PVEStatContainer):
         return "Node {}".format(self.node)
 
     @property
-    def memvmprov(self):
-        """Return sum of provisoned memory for all VMs."""
-        return self.csum('maxmem')
-
-    @property
-    def memvmused(self):
-        """Return sum of used memory for all VMs."""
-        return self.csum('mem')
-
-    @property
     def memnodeused_gb(self):
         """Return used memory for the node in GB."""
         return float(self.mem) / 1024**3
@@ -347,6 +337,16 @@ class PVEStatNode(PVEStatObject, PVEStatContainer):
     def memnodetotal_gb(self):
         """Return total memory for the node in GB."""
         return float(self.maxmem) / 1024**3
+
+    @property
+    def memvmprov(self):
+        """Return sum of provisoned memory for all VMs."""
+        return self.csum('maxmem')
+
+    @property
+    def memvmused(self):
+        """Return sum of used memory for all VMs."""
+        return self.csum('mem')
 
     @property
     def memvmused_gb(self):
