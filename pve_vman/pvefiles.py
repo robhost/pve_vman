@@ -50,11 +50,11 @@ def readpvefile(pvefilepath):
     fullpath = os.path.join(BASEPATH, pvefilepath)
     return _readfile(fullpath)
 
-def getstorageconf():
+def storageconf():
     """Return dictionary of the PVE cluster storage configuration."""
     filecontent = readpvefile('storage.cfg')
-    storageconf = {}
-    current = None
+    conf = {}
+    current = {}
 
     for line in filecontent:
         line_a = line.split()
@@ -65,34 +65,34 @@ def getstorageconf():
         key, value = line_a
 
         if key.endswith(':'):
-            current = storageconf[value] = dict(
-                handle=value,
-                type=key[:-1],
-                shared='1'
-            )
-        elif isinstance(current, dict):
+            current = conf[value] = {
+                'name': value,
+                'type': key[:-1],
+                'shared': '1'}
+        else:
             current[key] = value
 
-    return storageconf
+    return conf
 
-def getvmconf():
+def vmconf():
     """Return dictionary of the PVE cluster VM configurations."""
     pattern = os.path.join(BASEPATH, 'nodes', '*', '*', '*.conf')
-    configfiles = glob.glob(pattern)
-    vmconf = {}
-    current = None
+    conf = {}
 
-    for filepath in configfiles:
+    for filepath in glob.iglob(pattern):
         pathparts = filepath.split(os.path.sep)
-        vmid = pathparts[-1][:-5]
+
+        if pathparts[-2] not in ['qemu-server', 'lxc']:
+            continue
+
         vmtype = pathparts[-2]
+        vmid = pathparts[-1][:-5]
         vmnode = pathparts[-3]
 
-        current = vmconf[vmid] = dict(
-            vmid=vmid,
-            type=vmtype,
-            node=vmnode
-        )
+        current = conf[vmid] = {
+            'vmid': vmid,
+            'type': vmtype,
+            'node': vmnode}
 
         filecontent = _readfile(filepath)
 
@@ -117,7 +117,7 @@ def getvmconf():
 
             current[key] = value
 
-    return vmconf
+    return conf
 
 def stats():
     keys_by_prefix = {

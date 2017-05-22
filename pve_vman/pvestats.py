@@ -435,8 +435,8 @@ def buildcluster(resources=None, haresources=None):
     resources dict and haresources dict. If none given, get these using
     the getresource() and getharesources() methods.
     """
-    vmconf = pvefiles.getvmconf()
-    storageconf = pvefiles.getstorageconf()
+    vmconf = pvefiles.vmconf()
+    storageconf = pvefiles.storageconf()
     diskpattern = re.compile(r'^(?:rootfs|(?:scsi|sata|virtio|ide|mount)\d+)$')
 
     def ismigrateable(vmid):
