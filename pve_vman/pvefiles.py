@@ -35,7 +35,7 @@ BASEPATH = '/etc/pve'
 """Path to the PVE cluster configuration directory."""
 
 
-def readfile(filepath):
+def _readfile(filepath):
     """Return content of the file found at the given file path. Raises
     FileNotFoundError if the file doesn't exist and IOError if the file
     is not readable.
@@ -48,7 +48,7 @@ def readpvefile(pvefilepath):
     PVE config directory.
     """
     fullpath = os.path.join(BASEPATH, pvefilepath)
-    return readfile(fullpath)
+    return _readfile(fullpath)
 
 def getstorageconf():
     """Return dictionary of the PVE cluster storage configuration."""
@@ -94,7 +94,7 @@ def getvmconf():
             node=vmnode
         )
 
-        filecontent = readfile(filepath)
+        filecontent = _readfile(filepath)
 
         for line in filecontent:
             line_a = line.split()
