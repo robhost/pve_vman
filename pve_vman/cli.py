@@ -29,33 +29,28 @@ import argparse
 import sys
 import time
 import signal
+import logging
 
 from pve_vman import pvestats, pvecluster, pvevmiostats
 
-
-VERBOSITY = 0
-"""Verbosity level"""
+logging.basicConfig(format='%(message)s')
 
 
-class _VerbosityAction(argparse._CountAction):
+class _VerbosityAction(argparse.Action):
+    def __init__(self, option_strings, dest, **_):
+        super(_VerbosityAction, self).__init__(
+            option_strings=option_strings,
+            dest=dest,
+            nargs=0,
+            default=None,
+            required=False,
+            help=None)
+
     def __call__(self, parser, namespace, values, option_string=None):
-        global VERBOSITY
-        VERBOSITY += 1
-
-def debug1(msg):
-    """Debug message level 1."""
-    if VERBOSITY > 0:
-        __debug_print(msg, '\033[0;32mDEBUG1')
-
-def debug2(msg):
-    """Debug message level 2."""
-    if VERBOSITY > 1:
-        __debug_print(msg, '\033[0;33mDEBUG2')
-
-def __debug_print(msg, prefix='DEBUG'):
-    """Print the given msg and reset color."""
-    for line in str(msg).splitlines():
-        print('{}: {}\033[0m'.format(prefix, line))
+        logger = logging.getLogger()
+        current_level = logger.getEffectiveLevel()
+        if current_level > logging.DEBUG:
+            logger.setLevel(current_level - 10)
 
 def __int_fmt(num):
     for unit in ['','K','M','G','T','P']:
@@ -86,6 +81,7 @@ def exec_migrate(cluster, newcluster, args):
     """Run the necessary VM migrations in order to achive the state
     defined by the newcluster object.
     """
+    _logger = logging.getLogger(__name__)
     migrations = newcluster.migrations()
 
     print('===== Current state =====')
@@ -93,25 +89,22 @@ def exec_migrate(cluster, newcluster, args):
     print('======= New state =======')
     print_state(newcluster)
 
-    debug1('====== Migrations =======')
+    _logger.info('Running %d migrations', len(migrations))
 
     for migration in migrations:
-        debug1(migration)
-        debug2(' '.join(migration.cmd))
+        _logger.info("Running '%s'", migration)
+        _logger.debug(' '.join(migration.cmd))
 
     if 'count' in args:
         migrations = migrations[0:args.count]
 
-    debug1('Running {} migrations'.format(len(migrations)))
-
     for migration in migrations:
-        debug1("Running '{}'".format(' '.join(migration.cmd)))
         if args.noexec:
-            debug1('dry run -- skipping migration')
+            _logger.info('dry run -- skipping migration')
             continue
         out = migration.run()
-        debug2(out.stderr)
-        debug1(out.stdout)
+        _logger.info(out.stderr)
+        _logger.debug(out.stdout)
         if out.returncode != 0:
             raise Exception('migration returncode != 0')
 
