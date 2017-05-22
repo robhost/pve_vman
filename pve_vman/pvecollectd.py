@@ -29,23 +29,18 @@ import collectd
 from pve_vman import pvestats, pveqemumonitor
 
 
-plugin_metrics = dict(
-    PVE_VM_Net_Bytes = dict(
-        if_octets = ('netin', 'netout')
-    ),
-    PVE_VM_Disk_Bytes = dict(
-        disk_octets = ('diskread', 'diskwrite')
-    ),
-    PVE_VM_Disk_IOPS = dict(
-        disk_ops = ('diskrops', 'diskwops')
-    )
-)
+plugin_metrics = {
+    'PVE_VM_Net_Bytes': {
+        'if_octets': ('netin', 'netout')},
+    'PVE_VM_Disk_Bytes': {
+        'disk_octets': ('diskread', 'diskwrite')},
+    'PVE_VM_Disk_IOPS': {
+        'disk_ops': ('diskrops', 'diskwops')}}
 
 
 def dispatch(plugin, plugin_instance, type, type_instance, values,
              interval=60.0):
-    print(locals())
-    val = collectd.Values(type = type)
+    val = collectd.Values(type=type)
     val.plugin = plugin
 
     if plugin_instance is not None:
@@ -54,7 +49,7 @@ def dispatch(plugin, plugin_instance, type, type_instance, values,
     if type_instance is not None:
         val.type_instance = type_instance
 
-    if any(isinstance(values, e) for e in [list , tuple]):
+    if any(isinstance(values, e) for e in [list, tuple]):
         val.values = values
     else:
         val.values = [values]
@@ -65,7 +60,7 @@ def dispatch(plugin, plugin_instance, type, type_instance, values,
         val.dispatch()
     except Exception as exc:
         collectd.error("%s: failed to dispatch values :: %s :: %s"
-                % (plugin, exc, traceback.format_exc()))
+                       % (plugin, exc, traceback.format_exc()))
 
 
 def readstats():

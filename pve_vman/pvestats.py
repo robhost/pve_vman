@@ -176,8 +176,7 @@ class PVEStatContainer(object):
         """
         children = self.sortedbyattr(
             attr,
-            filtermethod=filtermethod
-            )
+            filtermethod=filtermethod)
 
         if children:
             return children[0]
@@ -191,8 +190,7 @@ class PVEStatContainer(object):
         children = self.sortedbyattr(
             attr,
             reverse=True,
-            filtermethod=filtermethod
-            )
+            filtermethod=filtermethod)
 
         if children:
             return children[0]
@@ -223,8 +221,7 @@ class PVEMigration(object):
             pvevm.type,
             pvevm.id,
             self.target,
-            online=1
-            )
+            online=1)
 
     def __repr__(self):
         fmt = 'Migration: {} from {} to {}'

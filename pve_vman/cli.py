@@ -156,17 +156,17 @@ def print_vmiostat(interval=1, count=0, limit=0, totals=False, ssum=False):
 def command_balance(parser, input_args):
     """Migrate VMs in order to achieve a memeory balanced state."""
     parser.add_argument(
-            '-v', '--verbose',
-            action=_VerbosityAction,
-            help='increase verbosity level, can be used multiple times')
+        '-v', '--verbose',
+        action=_VerbosityAction,
+        help='increase verbosity level, can be used multiple times')
     parser.add_argument(
-            '-n', '--noexec',
-            action='store_true',
-            help='only show, don\'t migrate')
+        '-n', '--noexec',
+        action='store_true',
+        help='only show, don\'t migrate')
     parser.add_argument(
-            '-c', '--count',
-            type=int,
-            help='number of migrations to run')
+        '-c', '--count',
+        type=int,
+        help='number of migrations to run')
 
     args = parser.parse_args(input_args)
 
@@ -178,24 +178,24 @@ def command_balance(parser, input_args):
 def command_flush(parser, input_args):
     """Migrate all migrateable VMs off the given Node."""
     parser.add_argument(
-            '-v', '--verbose',
-            action=_VerbosityAction,
-            help='increase verbosity level, can be used multiple times')
+        '-v', '--verbose',
+        action=_VerbosityAction,
+        help='increase verbosity level, can be used multiple times')
     parser.add_argument(
-            '-n', '--noexec',
-            action='store_true',
-            help='only show, don\'t migrate')
+        '-n', '--noexec',
+        action='store_true',
+        help='only show, don\'t migrate')
     parser.add_argument(
-            '-c', '--count',
-            type=int,
-            help='number of migrations to run')
+        '-c', '--count',
+        type=int,
+        help='number of migrations to run')
     parser.add_argument(
-            '-o', '--onlyha',
-            action='store_true',
-            help='only migrate HA managed VMs')
+        '-o', '--onlyha',
+        action='store_true',
+        help='only migrate HA managed VMs')
     parser.add_argument(
-            'node',
-            help='name of the node to migrate all VMs off')
+        'node',
+        help='name of the node to migrate all VMs off')
 
     args = parser.parse_args(input_args)
 
@@ -224,29 +224,29 @@ def command_vmiostat(parser, input_args):
         return ivalue
 
     parser.add_argument(
-            '-i', '--interval',
-            type=over_zero,
-            default=1,
-            help='interval of output (>0)')
+        '-i', '--interval',
+        type=over_zero,
+        default=1,
+        help='interval of output (>0)')
     parser.add_argument(
-            '-c', '--count',
-            type=int,
-            default=0,
-            help='number of iterations (0 = infinite)')
+        '-c', '--count',
+        type=int,
+        default=0,
+        help='number of iterations (0 = infinite)')
     parser.add_argument(
-            '-l', '--limit',
-            type=int,
-            default=0,
-            help='only show stats of VM with this id (0 = all)')
+        '-l', '--limit',
+        type=int,
+        default=0,
+        help='only show stats of VM with this id (0 = all)')
     parser.add_argument(
-            '-t', '--totals',
-            action='store_true',
-            help='show inital totals')
+        '-t', '--totals',
+        action='store_true',
+        help='show inital totals')
     parser.add_argument(
-            '-s', '--sum',
-            dest='ssum',
-            action='store_true',
-            help='show summary only')
+        '-s', '--sum',
+        dest='ssum',
+        action='store_true',
+        help='show summary only')
 
     args = parser.parse_args(input_args)
 
@@ -258,25 +258,25 @@ def cli():
     parser = argparse.ArgumentParser()
 
     subparsers = parser.add_subparsers(
-            dest='command',
-            title='commands')
+        dest='command',
+        title='commands')
 
     subparsers.add_parser(
-            'balance',
-            add_help=False,
-            help='migrate VMs to reach an even distribution across nodes')
+        'balance',
+        add_help=False,
+        help='migrate VMs to reach an even distribution across nodes')
     subparsers.add_parser(
-            'flush',
-            add_help=False,
-            help='migrate VMs from the given node')
+        'flush',
+        add_help=False,
+        help='migrate VMs from the given node')
     subparsers.add_parser(
-            'status',
-            add_help=False,
-            help='show the current cluster status')
+        'status',
+        add_help=False,
+        help='show the current cluster status')
     subparsers.add_parser(
-            'vmiostat',
-            add_help=False,
-            help='print IO stats for VMs')
+        'vmiostat',
+        add_help=False,
+        help='print IO stats for VMs')
 
     args, exceding_args = parser.parse_known_args()
 
