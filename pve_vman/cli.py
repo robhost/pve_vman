@@ -165,7 +165,9 @@ def command_balance(parser, input_args):
     args = parser.parse_args(input_args)
 
     cluster = pvestats.buildcluster()
-    newcluster = pvecluster.planbalance(cluster=cluster)
+    cluster.freeze()
+
+    newcluster = pvecluster.planbalance(cluster.clone())
 
     exec_migrate(cluster, newcluster, args)
 
@@ -194,10 +196,11 @@ def command_flush(parser, input_args):
     args = parser.parse_args(input_args)
 
     cluster = pvestats.buildcluster()
-    newcluster = pvecluster.planflush(
-            node=args.node,
-            onlyha=args.onlyha,
-            cluster=cluster)
+    cluster.freeze()
+
+    options = {'onlyha': args.onlyha}
+
+    newcluster = pvecluster.planflush(args.node, cluster.clone(), **options)
 
     exec_migrate(cluster, newcluster, args)
 
