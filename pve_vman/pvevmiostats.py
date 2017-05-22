@@ -33,6 +33,10 @@ class VMIOStats(object):
 
     keys = ('rd_bytes', 'rd_operations', 'wr_bytes', 'wr_operations')
 
+    @staticmethod
+    def new_statdict():
+        return  dict(zip(VMIOStats.keys, (0, 0, 0, 0)))
+
     def __init__(self, interval, pathglob='/run/qemu-server/*.qmp'):
         self.interval = interval
         self.pathglob = pathglob
@@ -43,12 +47,12 @@ class VMIOStats(object):
 
     def get_vmstats(self, vmid):
         if vmid not in self.vmstats:
-            self.vmstats[vmid] = self._new_statdict()
+            self.vmstats[vmid] = VMIOStats.new_statdict()
         return self.vmstats[vmid]
 
     def fetch(self):
         vmdiffs = {}
-        vmsums = self._new_statdict()
+        vmsums = VMIOStats.new_statdict()
 
         for qmpath in self.qmpaths():
             vmid = os.path.basename(qmpath).split(".")[0]
@@ -70,7 +74,3 @@ class VMIOStats(object):
             vmdiffs[vmid] = diffs
 
         return (vmdiffs, vmsums)
-
-    def _new_statdict(self):
-        return  dict(zip(VMIOStats.keys, (0,0,0,0)))
-
