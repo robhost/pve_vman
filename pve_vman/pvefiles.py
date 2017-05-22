@@ -184,3 +184,22 @@ def stats():
         stats_d[stat['type']].append(stat)
 
     return dict(stats_d)
+
+def haconf():
+    filecontent = readpvefile('ha/resources.cfg')
+    conf = {}
+
+    for line in filecontent:
+        line_a = line.split()
+
+        if not line_a:
+            continue
+
+        key, value = line_a
+
+        if key.endswith(':'):
+            current = conf[value] = {'name': value, 'type': key[:-1]}
+        elif isinstance(current, dict):
+            current[key] = value
+
+    return conf
