@@ -444,8 +444,8 @@ def buildcluster(resources=None, haresources=None):
         considered not migrateable, if a storage backend is used that is
         not rbd, nfs or iscsi.
         """
-        for handle, opts in vmconf[str(vmid)].items():
-            if diskpattern.match(handle) and ':' in opts:
+        for name, opts in vmconf[str(vmid)].items():
+            if diskpattern.match(name) and ':' in opts:
                 storage = opts.split(':')[0]
                 if storageconf[storage]['type'] not in ['rbd', 'nfs', 'iscsi']:
                     return False

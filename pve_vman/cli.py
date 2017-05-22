@@ -52,11 +52,11 @@ class _VerbosityAction(argparse.Action):
         if current_level > logging.DEBUG:
             logger.setLevel(current_level - 10)
 
-def __int_fmt(num):
-    for unit in ['','K','M','G','T','P']:
+def __int_fmt(num, base=1000):
+    for unit in ['', 'K', 'M', 'G', 'T', 'P']:
         if abs(num) < 10000:
             return "%d%s" % (num, unit)
-        num /= 1000
+        num /= base
     return num
 
 def print_state(cluster):
@@ -114,7 +114,8 @@ def print_vmiostat(interval=1, count=0, limit=0, totals=False, ssum=False):
     indefinitely until SIGINT is received else it runs count times and then
     terminates.
     """
-    def signal_handler(signal, frame):
+    def signal_handler(*_):
+        print()
         sys.exit(0)
 
     signal.signal(signal.SIGINT, signal_handler)
@@ -136,9 +137,9 @@ def print_vmiostat(interval=1, count=0, limit=0, totals=False, ssum=False):
             print(fmt.format('VM-ID', *keys))
 
             if not ssum:
-                for vm, diffs in sorted(vmdiffs.items()):
-                    if limit == 0 or limit == int(vm):
-                        print(fmt.format(vm, *int_fmt(diffs)))
+                for vmid, diffs in sorted(vmdiffs.items()):
+                    if limit == 0 or limit == int(vmid):
+                        print(fmt.format(vmid, *int_fmt(diffs)))
 
             print(fmt.format('total', *int_fmt(vmsums)))
 

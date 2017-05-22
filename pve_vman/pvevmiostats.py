@@ -33,7 +33,7 @@ class VMIOStats(object):
 
     keys = ('rd_bytes', 'rd_operations', 'wr_bytes', 'wr_operations')
 
-    def __init__(self, interval, pathglob = '/run/qemu-server/*.qmp'):
+    def __init__(self, interval, pathglob='/run/qemu-server/*.qmp'):
         self.interval = interval
         self.pathglob = pathglob
         self.vmstats = {}
