@@ -28,6 +28,8 @@ into python data structures.
 import os
 import glob
 
+from collections import defaultdict
+
 
 BASEPATH = '/etc/pve'
 """Path to the PVE cluster configuration directory."""
@@ -116,3 +118,69 @@ def getvmconf():
             current[key] = value
 
     return vmconf
+
+def stats():
+    keys_by_prefix = {
+        'pve2-storage': (
+            ('storage', str),
+            ('timestamp', int),
+            ('total', int),
+            ('used', int)),
+        'pve2-node': (
+            ('node', str),
+            ('uptime', int),
+            ('level', str),
+            ('timestamp', int),
+            ('load', float),
+            ('maxcpu', int),
+            ('cpu', float),
+            ('iowait', float),
+            ('memtotal', int),
+            ('memused', int),
+            ('swaptotal', int),
+            ('swapused', int),
+            ('roottotal', int),
+            ('rootused', int),
+            ('netin', int),
+            ('netout', int)),
+        'pve2.3-vm': (
+            ('vmid', str),
+            ('uptime', int),
+            ('name', str),
+            ('status', str),
+            ('template', str),
+            ('timestamp', int),
+            ('maxcpu', int),
+            ('cpu', float),
+            ('maxmem', int),
+            ('mem', int),
+            ('maxdisk', int),
+            ('disk', int),
+            ('netin', int),
+            ('netout', int),
+            ('diskread', int),
+            ('diskwrite', int))
+        }
+
+    def parseline(line):
+        line_a = line.split(':')
+        identifier = line_a[0].split('/')
+        prefix = identifier[0]
+        line_a[0] = identifier[1]
+        stattype = prefix.split('-')[-1]
+        stat = {'type': stattype, 'prefix': prefix}
+        keys = keys_by_prefix.get(prefix, [])
+
+        for (key, conv), value in zip(keys, line_a):
+            stat[key] = conv(value) if value else conv()
+
+        return stat
+
+    filecontent = readpvefile('.rrd')
+    stats_d = defaultdict(list)
+
+    for line in filecontent:
+        stat = parseline(line.strip())
+        stats_d[stat['type']].append(stat)
+
+    return dict(stats_d)
