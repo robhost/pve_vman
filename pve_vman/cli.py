@@ -27,10 +27,8 @@ from __future__ import print_function
 
 import argparse
 import sys
-import glob
 import time
 import signal
-import os
 
 from pve_vman import pvestats, pvecluster, pvevmiostats
 
