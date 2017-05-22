@@ -24,7 +24,6 @@
 via its unix socket."""
 
 import os
-import sys
 import socket
 import json
 
@@ -108,10 +107,3 @@ def query_blockstats(vmid):
     pqm.send(execute='query-blockstats')
 
     return pqm.receive()
-
-
-if __name__ == '__main__':
-    if len(sys.argv) >= 2:
-        print(query_blockstats(sys.argv[1]))
-    else:
-        print('no vm id given')
