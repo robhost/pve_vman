@@ -75,6 +75,13 @@ class PVEStatObject(object):
             return self.attrs.get(self.idkey)
         raise Exception("idkey '{}' not found in attrs".format(self.idkey))
 
+    @property
+    def isonline(self):
+        """Return boolean if the reource is considered online/running
+        or not.
+        """
+        return hasattr(self, 'uptime') and self.uptime != 0
+
 
 class PVEStatContainer(object):
     """Abstract class that can be used for handling PVE types that
