@@ -165,11 +165,13 @@ class PVEStatContainer(object):
 
         return True
 
-    def csum(self, attr):
+    def csum(self, attr, filtermethod=None):
         """Return sum over all children of the attribute values for the
         given name.
         """
-        return sum([getattr(c, attr) for c in self.children])
+        children = self.cfilter(filtermethod)
+
+        return sum([getattr(c, attr) for c in children])
 
     def sortedbyattr(self, attr, reverse=False, filtermethod=None):
         """Get the children list sorted by the attribute with the given
