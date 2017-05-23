@@ -56,6 +56,9 @@ class PVEStatObject(object):
             return self.attrs.get(attr)
         return self.__getattribute__(attr)
 
+    def __contains__(self, item):
+        return item in self.attrs
+
     def __repr__(self):
         return str(self.id)
 
@@ -111,6 +114,9 @@ class PVEStatContainer(object):
             return False
         else:
             return True
+
+    def __len__(self):
+        return len(self.children)
 
     def keys(self):
         """Return a list of identifier for all children."""
