@@ -422,19 +422,8 @@ class PVEStatVM(PVEStatObject):
         return PVEMigration(self, target)
 
 
-def getresources():
-    """Return cluster resources as a dict."""
-    return pvesh.get('/cluster/resources').run().asobj()
-
-def getharesources():
-    """Return cluster ha resources as a dict."""
-    return pvesh.get('/cluster/ha/resources').run().asobj()
-
-def buildcluster(resources=None, haresources=None):
-    """Return a PVEStatCluster object built using the given
-    resources dict and haresources dict. If none given, get these using
-    the getresource() and getharesources() methods.
-    """
+def buildcluster():
+    """Return a PVEStatCluster object."""
     vmconf = pvefiles.vmconf()
     storageconf = pvefiles.storageconf()
     diskpattern = re.compile(r'^(?:rootfs|(?:scsi|sata|virtio|ide|mount)\d+)$')
@@ -451,28 +440,26 @@ def buildcluster(resources=None, haresources=None):
                     return False
         return True
 
-    if resources is None:
-        resources = getresources()
-
-    if haresources is None:
-        haresources = getharesources()
-
-    hadict = {int(hr['sid'].split(':')[1]): hr for hr in haresources}
-
+    resources = pvefiles.stats()
+    haresources = pvefiles.haconf()
     cluster = PVEStatCluster()
 
-    for resource in resources:
-        if resource['type'] == 'node':
-            cluster.add(PVEStatNode(**resource))
+    for node in resources['node']:
+        cluster.add(PVEStatNode(**node))
 
-    for resource in resources:
-        if resource['type'] not in ('node', 'storage'):
-            node = cluster[resource['node']]
-            haresource = hadict.get(resource['vmid'], {})
-            resource['ha'] = len(haresource) != 0
-            resource['haenabled'] = haresource.get('state', '') == 'enabled'
-            resource['hagroup'] = haresource.get('group', None)
-            resource['migrateable'] = ismigrateable(resource['vmid'])
-            node.add(PVEStatVM(**resource))
+    for res in resources['vm']:
+        vmid = res['vmid']
+        nodeid = vmconf[vmid]['node']
+        haresource = haresources.get(vmid, {})
+
+        res['type'] = vmconf[vmid]['type'].replace('-server', '')
+        res['node'] = nodeid
+        res['ha'] = len(haresource) != 0
+        res['haenabled'] = haresource.get('state', '') == 'enabled'
+        res['hagroup'] = haresource.get('group', None)
+        res['migrateable'] = ismigrateable(vmid)
+
+        node = cluster[res['node']]
+        node.add(PVEStatVM(**res))
 
     return cluster
