@@ -26,6 +26,7 @@ PVE cluster based on the stats information the PVE-API provides.
 
 import functools
 import re
+import logging
 
 from pve_vman import pvesh, pvefiles
 
@@ -176,12 +177,12 @@ class PVEStatContainer(object):
         is a callable, only elements that the callable returns True for
         are sorted and returned.
         """
-        if callable(filtermethod):
-            arr = self.cfilter(filtermethod)
-        else:
-            arr = self.children
+        children = self.cfilter(filtermethod)
 
-        return sorted(arr, key=lambda c: getattr(c, attr), reverse=reverse)
+        return sorted(
+            children,
+            key=lambda c: getattr(c, attr),
+            reverse=reverse)
 
     def lowestchild(self, attr, filtermethod=None):
         """Return child that has the lowest value for the given attr.
@@ -210,11 +211,17 @@ class PVEStatContainer(object):
 
         return None
 
-    def cfilter(self, method=lambda c: True):
+    def cfilter(self, method=None):
         """Return list of elements which method returns True for.
         Therefore method needs to be callable.
         """
-        return [c for c in self.children if method(c)]
+        _logger = logging.getLogger(__name__)
+
+        if method is not None and not callable(method):
+            _logger.info('filtermethod not callable, is %s', type(method))
+            method = None
+
+        return filter(method, self.children)
 
 
 class PVEMigration(object):
@@ -280,10 +287,7 @@ class PVEStatCluster(PVEStatContainer):
         given, only Nodes that the filtermethod returns True for are
         considered and returned.
         """
-        if filtermethod is None:
-            nodelist = self.children
-        else:
-            nodelist = self.cfilter(filtermethod)
+        nodelist = self.cfilter(filtermethod)
 
         return [n for n in nodelist]
 
