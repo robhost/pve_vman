@@ -95,13 +95,10 @@ def exec_migrate(cluster, newcluster, args):
         _logger.info("Running '%s'", migration)
         _logger.debug(' '.join(migration.cmd))
 
-    if 'count' in args:
-        migrations = migrations[0:args.count]
-
-    for migration in migrations:
         if args.noexec:
             _logger.info('dry run -- skipping migration')
             continue
+
         out = migration.run()
         _logger.info(out.stderr)
         _logger.debug(out.stdout)
@@ -167,7 +164,11 @@ def command_balance(parser, input_args):
     cluster = pvestats.buildcluster()
     cluster.freeze()
 
-    newcluster = pvecluster.planbalance(cluster.clone())
+    options = {}
+    if 'count' in args and args.count:
+        options['iterations'] = args.count
+
+    newcluster = pvecluster.planbalance(cluster.clone(), **options)
 
     exec_migrate(cluster, newcluster, args)
 
@@ -199,6 +200,8 @@ def command_flush(parser, input_args):
     cluster.freeze()
 
     options = {'onlyha': args.onlyha}
+    if 'count' in args and args.count:
+        options['maxmigrations'] = args.count
 
     newcluster = pvecluster.planflush(args.node, cluster.clone(), **options)
 

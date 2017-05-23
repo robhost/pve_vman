@@ -29,7 +29,10 @@ or balancing VMs across all nodes.
 from pve_vman import pvestats
 
 
-def planbalance(cluster):
+MAXMIGRATIONS = 150
+
+
+def planbalance(cluster, iterations=MAXMIGRATIONS):
     """Migrate VMs in order to even the memory usage percentage on the
     nodes. The given cluster is changed.
     """
@@ -49,7 +52,6 @@ def planbalance(cluster):
     if highestvm is None:
         return cluster
 
-    iterations = 100
     i = 0
 
     # For a maximum of the given number of iterations, try to move VMs
@@ -65,7 +67,7 @@ def planbalance(cluster):
 
     return cluster
 
-def planflush(node, cluster, onlyha=False):
+def planflush(node, cluster, onlyha=False, maxmigrations=MAXMIGRATIONS):
     """Migrate all migratable VMs off the given node in order to empty
     it, e.g. for maintenance. The given cluster is changed.
     """
@@ -75,7 +77,7 @@ def planflush(node, cluster, onlyha=False):
     emptynode = cluster[node]
     cluster.remove(node)
 
-    for pvevm in emptynode.migrateable_vms():
+    for pvevm in emptynode.migrateable_vms()[0:maxmigrations]:
         if onlyha and not pvevm.ha:
             continue
 
