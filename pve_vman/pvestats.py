@@ -412,9 +412,7 @@ class PVEStatNode(PVEStatObject, PVEStatContainer):
         """Return all migrations that are necessary to reach the target
         state of the cluster.
         """
-        vms = self.migrateable_vms()
-
-        return [vm.migration(self) for vm in vms if vm.needsmove(self)]
+        return [vm.migration(self) for vm in self.moved_vms()]
 
 
 class PVEStatVM(PVEStatObject):
