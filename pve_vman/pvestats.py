@@ -386,6 +386,10 @@ class PVEStatNode(PVEStatObject, PVEStatContainer):
 
         return [v for v in vmlist]
 
+    def moved_vms(self):
+        """Return list of VMs that have been moved to this node."""
+        return [vm for vm in self.vms() if vm.needsmove(self)]
+
     def migrateable_vms(self):
         """Return list of VMs that are migrateable."""
         return self.vms(lambda c: c.migrateable)
