@@ -270,6 +270,52 @@ class PVEStatCluster(PVEStatContainer):
     """Proxmox Cluster that is the root container containing a list of
     Proxmox nodes as children.
     """
+    @property
+    def memused(self):
+        """Return sum of used memory of all Nodes."""
+        return self.csum('memused', lambda c: c.isonline)
+
+    @property
+    def memtotal(self):
+        """Return sum of total memory of all Nodes."""
+        return self.csum('memtotal', lambda c: c.isonline)
+
+    @property
+    def memused_perc(self):
+        """Return memory used in percent of maximum memory."""
+        return self.memused * 100 / self.memtotal
+
+    @property
+    def memvmused(self):
+        """Return sum of used memory for all VMs."""
+        return self.csum('memvmused')
+
+    @property
+    def memvmprov(self):
+        """Return sum of provisoned memory for all VMs."""
+        return self.csum('memvmprov')
+
+    @property
+    def memvmused_perc(self):
+        """Return percentage of memory used by VMs to memory provisioned
+        on all nodes.
+        """
+        return self.memvmused * 100 / self.memvmprov
+
+    @property
+    def memvmclusterused_perc(self):
+        """Return percentage of memory used by VMs to total cluster
+        memory.
+        """
+        return self.memvmused * 100 / self.memtotal
+
+    @property
+    def memvmclusterprov_perc(self):
+        """Return percentage of memory provisioned by VMs to total
+        cluster memory.
+        """
+        return self.memvmprov * 100 / self.memtotal
+
     def clone(self):
         """Return a new PVEStatCluster object that has completely cloned
         children. Changes on the new object will not affect the original
@@ -354,6 +400,10 @@ class PVEStatNode(PVEStatObject, PVEStatContainer):
         """Return total memory for the node in GB."""
         return float(self.maxmem) / 1024**3
 
+    def memused_perc(self):
+        """Return memory used in percent of maximum memory."""
+        return self.memused * 100 / self.memtotal
+
     @property
     def memvmprov(self):
         """Return sum of provisoned memory for all VMs."""
@@ -369,10 +419,28 @@ class PVEStatNode(PVEStatObject, PVEStatContainer):
         """Return memory used by VMs on the node in GB."""
         return float(self.memvmused) / 1024**3
 
+    def memvmused_perc(self):
+        """Return percentage of memory used by VMs to memory provisioned
+        on the node.
+        """
+        return self.memvmused * 100 / self.memvmprov
+
+    @property
+    def memvmnodeused_perc(self):
+        """Return percentage of memory used by VMs to total node memory.
+        """
+        return self.memvmused * 100 / self.memtotal
+
     @property
     def memvmprovisioned_gb(self):
         """Return memory provisined for VMs on the node in GB."""
         return float(self.memvmprov) / 1024**3
+
+    def memvmnodeprov_perc(self):
+        """Return percentage of memory provisioned by VMs to total node
+        memory.
+        """
+        return self.memvmprov * 100 / self.memtotal
 
     def vms(self, filtermethod=None):
         """Return a list of all VMs of the Node. If filtermethod is
@@ -431,6 +499,10 @@ class PVEStatVM(PVEStatObject):
     def memprovisioned_gb(self):
         """Return memory provisioned for the VM in GB."""
         return float(self.maxmem) / 1024**3
+
+    def memused_perc(self):
+        """Return memory used in percent of provisioned memory."""
+        return self.mem * 100 / self.maxmem
 
     def needsmove(self, target):
         """Return if the VM is needs a migration to run on the target
