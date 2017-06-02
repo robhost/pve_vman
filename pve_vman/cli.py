@@ -61,21 +61,45 @@ def __int_fmt(num, base=1000):
 
 def print_state(cluster):
     """Format and print the given cluster object."""
+    lines = []
+    migrateable = lambda c: c.migrateable
+    havms = lambda c: c.ha
+
     for node in cluster:
-        fmt = 'Node {}: Mem GB: {:.1f} / {:.1f} (VMs: {:.1f} / {:.1f});'
-        fmt += ' VMs: {}; HA-VMs: {}; Migrateable: {}'
-        line = fmt.format(
-            node.node,
-            node.memnodeused_gb,
-            node.memnodetotal_gb,
-            node.memvmused_gb,
-            node.memvmprovisioned_gb,
+        lines.append((
+            'Node {}'.format(node.node),
+            __int_fmt(node.memtotal, base=1024),
+            node.memused_perc,
+            node.memvmnodeused_perc,
+            node.memvmnodeprov_perc,
             len(node.children),
-            len(node.vms(lambda c: c.ha)),
-            len(node.vms(lambda c: c.migrateable)))
+            len(node.vms(migrateable)),
+            len(node.vms(havms))))
 
-        print(line)
+    lines.append((
+        'Cluster',
+        __int_fmt(cluster.memtotal, base=1024),
+        cluster.memused_perc,
+        cluster.memvmclusterused_perc,
+        cluster.memvmclusterprov_perc,
+        len(cluster.vms()),
+        len(cluster.vms(migrateable)),
+        len(cluster.vms(havms))))
 
+    fmt_first = '{{:{:d}s}}'.format(max([len(l[0]) for l in lines]))
+    fmt_h1 = fmt_first
+    fmt_h1 += ' | {:^12s} | {:^11s} | {:^18s}'
+    fmt_h2 = fmt_first
+    fmt_h2 += ' | {:^5s} | {:^4s} | {:^4s} | {:^4s} | {:^4s} | {:^4s} | {:^4s}'
+    fmt_d = fmt_first
+    fmt_d += ' | {:>5s} | {:3d}% | {:3d}% | {:3d}%'
+    fmt_d += ' | {:4d} | {:4d} | {:4d}'
+
+    print(fmt_h1.format('', 'Node Mem', 'VM Mem Sums', 'VM Counts'))
+    print(fmt_h2.format('', 'Total', 'Used', 'Used', 'Prov', 'Tot.', 'Migr',
+                        'HA'))
+    for line in lines:
+        print(fmt_d.format(*line))
 
 def exec_migrate(cluster, newcluster, args):
     """Run the necessary VM migrations in order to achive the state
