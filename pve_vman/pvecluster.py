@@ -26,44 +26,48 @@ or balancing VMs across all nodes.
 """
 
 
+import logging
+
 from pve_vman import pvestats
 
 
 MAXMIGRATIONS = 150
+BALDIFFPERC = 5
 
 
-def planbalance(cluster, iterations=MAXMIGRATIONS):
+def planbalance(cluster, iterations=MAXMIGRATIONS, diffperc=BALDIFFPERC):
     """Migrate VMs in order to even the memory usage percentage on the
     nodes. The given cluster is changed.
     """
-    def nodememdiff(cluster):
-        """Return the difference of memeory between the node with the
-        highest memory usage and the one with the lowest.
-        """
-        high = cluster.highestnode(attr)
-        low = cluster.lowestnode(attr)
-        return getattr(high, attr) - getattr(low, attr)
+    _logger = logging.getLogger(__name__)
 
+    def nodediff(diffattr, node1, node2):
+        diff = getattr(node1, diffattr) - getattr(node2, diffattr)
+        return abs(diff)
 
-
-    attr = 'memvmused'
-    highestvm = cluster.highestvm('mem', lambda c: c.migrateable)
-
-    if highestvm is None:
-        return cluster
-
-    i = 0
+    attr = 'memvmnodeused_perc'
 
     # For a maximum of the given number of iterations, try to move VMs
-    # until the memory difference between the nodes is lower than the
-    # memory usage of the VM with the highest memory usage.
-    while i < iterations and nodememdiff(cluster) > highestvm.mem:
-        highestnode = cluster.highestnode(attr)
-        lowestnode = cluster.lowestnode(attr)
-        curvm = highestnode.migrateable_vms().pop()
+    # until the memory percentage difference between the nodes is lower
+    # than the break condition value. Prefer VMs that already have been
+    # moved in order to minimize movement.
+    for _ in range(iterations):
+        highestnode = cluster.highestnode(attr, lambda c: c.isonline)
+        lowestnode = cluster.lowestnode(attr, lambda c: c.isonline)
+
+        if diffperc > nodediff(attr, highestnode, lowestnode):
+            break
+
+        vms = highestnode.moved_vms()
+
+        if not vms:
+            vms = highestnode.migrateable_vms()
+
+        curvm = vms.pop()
+        _logger.debug(str(curvm))
+
         highestnode.remove(curvm)
         lowestnode.add(curvm)
-        i += 1
 
     return cluster
 
@@ -82,7 +86,7 @@ def planflush(node, cluster, onlyha=False, maxmigrations=MAXMIGRATIONS):
 
         emptynode.remove(pvevm)
         lowestnode = cluster.lowestnode(
-            'memvmused',
+            'memvmnodeused_perc',
             lambda n: n.isonline and n != emptynode)
         lowestnode.add(pvevm)
 
