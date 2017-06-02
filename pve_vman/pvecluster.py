@@ -75,14 +75,15 @@ def planflush(node, cluster, onlyha=False, maxmigrations=MAXMIGRATIONS):
         raise Exception("node '{}' doesn't exist".format(node))
 
     emptynode = cluster[node]
-    cluster.remove(node)
 
     for pvevm in emptynode.migrateable_vms()[0:maxmigrations]:
         if onlyha and not pvevm.ha:
             continue
 
         emptynode.remove(pvevm)
-        lowestnode = cluster.lowestnode('memvmused')
+        lowestnode = cluster.lowestnode(
+            'memvmused',
+            lambda n: n.isonline and n != emptynode)
         lowestnode.add(pvevm)
 
     return cluster
