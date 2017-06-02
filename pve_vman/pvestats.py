@@ -391,15 +391,6 @@ class PVEStatNode(PVEStatObject, PVEStatContainer):
         return "Node {}".format(self.node)
 
     @property
-    def memnodeused_gb(self):
-        """Return used memory for the node in GB."""
-        return float(self.mem) / 1024**3
-
-    @property
-    def memnodetotal_gb(self):
-        """Return total memory for the node in GB."""
-        return float(self.maxmem) / 1024**3
-
     def memused_perc(self):
         """Return memory used in percent of maximum memory."""
         return self.memused * 100 / self.memtotal
@@ -415,10 +406,6 @@ class PVEStatNode(PVEStatObject, PVEStatContainer):
         return self.csum('mem')
 
     @property
-    def memvmused_gb(self):
-        """Return memory used by VMs on the node in GB."""
-        return float(self.memvmused) / 1024**3
-
     def memvmused_perc(self):
         """Return percentage of memory used by VMs to memory provisioned
         on the node.
@@ -432,10 +419,6 @@ class PVEStatNode(PVEStatObject, PVEStatContainer):
         return self.memvmused * 100 / self.memtotal
 
     @property
-    def memvmprovisioned_gb(self):
-        """Return memory provisined for VMs on the node in GB."""
-        return float(self.memvmprov) / 1024**3
-
     def memvmnodeprov_perc(self):
         """Return percentage of memory provisioned by VMs to total node
         memory.
@@ -491,15 +474,6 @@ class PVEStatVM(PVEStatObject):
         return 'VM {}'.format(self.id)
 
     @property
-    def memused_gb(self):
-        """Return memory used by the VM in GB."""
-        return float(self.mem) / 1024**3
-
-    @property
-    def memprovisioned_gb(self):
-        """Return memory provisioned for the VM in GB."""
-        return float(self.maxmem) / 1024**3
-
     def memused_perc(self):
         """Return memory used in percent of provisioned memory."""
         return self.mem * 100 / self.maxmem
