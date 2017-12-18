@@ -43,7 +43,8 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'vman = pve_vman.cli:cli'
+            'vman = pve_vman.cli:vman',
+            'vmiostat = pve_vman.cli:vmiostat'
             ]
         },
     include_package_data = True

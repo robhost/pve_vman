@@ -277,8 +277,8 @@ def command_vmiostat(parser, input_args):
     print_vmiostat(**dict(args._get_kwargs()))
 
 
-def cli():
-    """Parse arguments and call matching handler."""
+def vman():
+    """CLI main function for vman utility."""
     parser = argparse.ArgumentParser()
 
     subparsers = parser.add_subparsers(
@@ -297,10 +297,6 @@ def cli():
         'status',
         add_help=False,
         help='show the current cluster status')
-    subparsers.add_parser(
-        'vmiostat',
-        add_help=False,
-        help='print IO stats for VMs')
 
     args, exceding_args = parser.parse_known_args()
 
@@ -317,5 +313,13 @@ def cli():
     func(cmd_parser, exceding_args)
 
 
-if __name__ == '__main__':
-    cli()
+def vmiostat():
+    """CLI main function for vmiostat utility."""
+    parser = argparse.ArgumentParser()
+
+    args, exceding_args = parser.parse_known_args()
+
+    progname = '{}'.format(parser.prog)
+    cmd_parser = argparse.ArgumentParser(prog=progname)
+
+    command_vmiostat(cmd_parser, exceding_args)
