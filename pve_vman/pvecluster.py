@@ -71,23 +71,33 @@ def planbalance(cluster, iterations=MAXMIGRATIONS, diffperc=BALDIFFPERC):
 
     return cluster
 
-def planflush(node, cluster, onlyha=False, maxmigrations=MAXMIGRATIONS):
-    """Migrate all migratable VMs off the given node in order to empty
+def planflush(nodes, cluster, onlyha=False, maxmigrations=MAXMIGRATIONS):
+    """Migrate all migratable VMs off the given nodes in order to empty
     it, e.g. for maintenance. The given cluster is changed.
     """
-    if node not in cluster.keys():
-        raise Exception("node '{}' doesn't exist".format(node))
+    emptynodes = []
+    iterations = 0
 
-    emptynode = cluster[node]
+    for node in nodes:
+        if node not in cluster.keys():
+            raise Exception("node '{}' doesn't exist".format(node))
 
-    for pvevm in emptynode.migrateable_vms()[0:maxmigrations]:
-        if onlyha and not pvevm.ha:
-            continue
+        emptynodes.append(cluster[node])
 
-        emptynode.remove(pvevm)
-        lowestnode = cluster.lowestnode(
-            'memvmnodeused_perc',
-            lambda n: n.isonline and n != emptynode)
-        lowestnode.add(pvevm)
+    for emptynode in emptynodes:
+        for pvevm in emptynode.migrateable_vms():
+            if onlyha and not pvevm.ha:
+                continue
+
+            if iterations >= maxmigrations:
+                break
+
+            iterations += 1
+
+            emptynode.remove(pvevm)
+            lowestnode = cluster.lowestnode(
+                'memvmnodeused_perc',
+                lambda n: n.isonline and n not in emptynodes)
+            lowestnode.add(pvevm)
 
     return cluster

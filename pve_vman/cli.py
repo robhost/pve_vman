@@ -215,8 +215,9 @@ def command_flush(parser, input_args):
         action='store_true',
         help='only migrate HA managed VMs')
     parser.add_argument(
-        'node',
-        help='name of the node to migrate all VMs off')
+        'nodes',
+        nargs='+',
+        help='name of the nodes to migrate all VMs off')
 
     args = parser.parse_args(input_args)
 
@@ -227,7 +228,7 @@ def command_flush(parser, input_args):
     if 'count' in args and args.count:
         options['maxmigrations'] = args.count
 
-    newcluster = pvecluster.planflush(args.node, cluster.clone(), **options)
+    newcluster = pvecluster.planflush(args.nodes, cluster.clone(), **options)
 
     exec_migrate(cluster, newcluster, args)
 
