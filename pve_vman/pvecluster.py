@@ -36,7 +36,8 @@ MAXMIGRATIONS = 150
 BALDIFFPERC = 5
 
 
-def planbalance(cluster, iterations=MAXMIGRATIONS, diffperc=BALDIFFPERC):
+def planbalance(cluster, iterations=MAXMIGRATIONS, diffperc=BALDIFFPERC,
+        ignorenodenames=[]):
     """Migrate VMs in order to even the memory usage percentage on the
     nodes. The given cluster is changed.
     """
@@ -47,13 +48,20 @@ def planbalance(cluster, iterations=MAXMIGRATIONS, diffperc=BALDIFFPERC):
         return abs(diff)
 
     attr = 'memvmnodeused_perc'
+    ignorenodes = []
+
+    for node in ignorenodenames:
+        if node not in cluster.keys():
+            raise InputError("node '{}' doesn't exist".format(node))
+
+        ignorenodes.append(cluster[node])
 
     # For a maximum of the given number of iterations, try to move VMs
     # until the memory percentage difference between the nodes is lower
     # than the break condition value. Prefer VMs that already have been
     # moved in order to minimize movement.
 
-    nodefilter = lambda n: n.isonline
+    nodefilter = lambda n: n.isonline and n not in ignorenodes
 
     for _ in range(iterations):
         highestnode = cluster.highestnode(attr, nodefilter)
@@ -82,11 +90,13 @@ def planbalance(cluster, iterations=MAXMIGRATIONS, diffperc=BALDIFFPERC):
 
     return cluster
 
-def planflush(nodes, cluster, onlyha=False, maxmigrations=MAXMIGRATIONS):
+def planflush(nodes, cluster, onlyha=False, maxmigrations=MAXMIGRATIONS,
+        ignorenodenames=[]):
     """Migrate all migratable VMs off the given nodes in order to empty
     it, e.g. for maintenance. The given cluster is changed.
     """
     emptynodes = []
+    ignorenodes = []
     iterations = 0
 
     for node in nodes:
@@ -94,6 +104,12 @@ def planflush(nodes, cluster, onlyha=False, maxmigrations=MAXMIGRATIONS):
             raise InputError("node '{}' doesn't exist".format(node))
 
         emptynodes.append(cluster[node])
+
+    for node in ignorenodenames:
+        if node not in cluster.keys():
+            raise InputError("node '{}' doesn't exist".format(node))
+
+        ignorenodes.append(cluster[node])
 
     for emptynode in emptynodes:
         for pvevm in emptynode.migrateable_vms():
@@ -108,7 +124,7 @@ def planflush(nodes, cluster, onlyha=False, maxmigrations=MAXMIGRATIONS):
             emptynode.remove(pvevm)
             lowestnode = cluster.lowestnode(
                 'memvmnodeused_perc',
-                lambda n: n.isonline and n not in emptynodes)
+                lambda n: n.isonline and n not in emptynodes + ignorenodes)
 
             if lowestnode is None:
                 raise PlanningError('no target node found')

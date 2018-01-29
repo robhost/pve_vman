@@ -185,6 +185,10 @@ def command_balance(parser, input_args):
         '-c', '--count',
         type=int,
         help='number of migrations to run')
+    parser.add_argument(
+        '-i', '--ignore',
+        type=lambda x: x.split(','),
+        help='comma separated list of nodes to ignore as migration targets')
 
     args = parser.parse_args(input_args)
 
@@ -194,6 +198,8 @@ def command_balance(parser, input_args):
     options = {}
     if 'count' in args and args.count:
         options['iterations'] = args.count
+    if 'ignore' in args and args.ignore:
+        options['ignorenodenames'] = args.ignore
 
     try:
         newcluster = pvecluster.planbalance(cluster.clone(), **options)
@@ -220,6 +226,10 @@ def command_flush(parser, input_args):
         action='store_true',
         help='only migrate HA managed VMs')
     parser.add_argument(
+        '-i', '--ignore',
+        type=lambda x: x.split(','),
+        help='comma separated list of nodes to ignore as migration targets')
+    parser.add_argument(
         'nodes',
         nargs='+',
         help='name of the nodes to migrate all VMs off')
@@ -232,6 +242,9 @@ def command_flush(parser, input_args):
     options = {'onlyha': args.onlyha}
     if 'count' in args and args.count:
         options['maxmigrations'] = args.count
+    if 'ignore' in args and args.ignore:
+        options['ignorenodenames'] = args.ignore
+
     try:
         newcluster = pvecluster.planflush(args.nodes, cluster.clone(), **options)
         exec_migrate(cluster, newcluster, args)
