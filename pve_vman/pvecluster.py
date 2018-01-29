@@ -29,7 +29,7 @@ or balancing VMs across all nodes.
 import logging
 
 from pve_vman import pvestats
-from pve_vman.exceptions import InputError
+from pve_vman.exceptions import InputError, PlanningError
 
 
 MAXMIGRATIONS = 150
@@ -57,7 +57,14 @@ def planbalance(cluster, iterations=MAXMIGRATIONS, diffperc=BALDIFFPERC):
 
     for _ in range(iterations):
         highestnode = cluster.highestnode(attr, nodefilter)
+
+        if highestnode is None:
+            raise PlanningError('no node found to migrate from')
+
         lowestnode = cluster.lowestnode(attr, nodefilter)
+
+        if lowestnode is None:
+            raise PlanningError('no node found to migrate to')
 
         if diffperc > nodediff(attr, highestnode, lowestnode):
             break
@@ -102,6 +109,10 @@ def planflush(nodes, cluster, onlyha=False, maxmigrations=MAXMIGRATIONS):
             lowestnode = cluster.lowestnode(
                 'memvmnodeused_perc',
                 lambda n: n.isonline and n not in emptynodes)
+
+            if lowestnode is None:
+                raise PlanningError('no target node found')
+
             lowestnode.add(pvevm)
 
     return cluster

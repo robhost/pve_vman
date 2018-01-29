@@ -32,3 +32,7 @@ class MigrationError(Error):
     """Exception raised for errors during migration of VMs."""
     pass
 
+class PlanningError(Error):
+    """Exception raised for errors during planning of migration of VMs."""
+    pass
+
