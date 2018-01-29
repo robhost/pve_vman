@@ -32,6 +32,7 @@ import signal
 import logging
 
 from pve_vman import pvestats, pvecluster, pvevmiostats
+from pve_vman.exceptions import Error, MigrationError
 
 logging.basicConfig(format='%(message)s')
 
@@ -126,8 +127,10 @@ def exec_migrate(cluster, newcluster, args):
         out = migration.run()
         _logger.info(out.stderr)
         _logger.debug(out.stdout)
+
         if out.returncode != 0:
-            raise Exception('migration returncode != 0')
+            raise MigrationError(
+                'migration returncode not 0: {}'.format(out.returncode))
 
 def print_vmiostat(interval=1, count=0, limit=0, totals=False, ssum=False):
     """Print the throughput per VM. Default is to print a line per VM
@@ -192,9 +195,11 @@ def command_balance(parser, input_args):
     if 'count' in args and args.count:
         options['iterations'] = args.count
 
-    newcluster = pvecluster.planbalance(cluster.clone(), **options)
-
-    exec_migrate(cluster, newcluster, args)
+    try:
+        newcluster = pvecluster.planbalance(cluster.clone(), **options)
+        exec_migrate(cluster, newcluster, args)
+    except Error as e:
+        print('{}: {} - Aborting'.format(e.__class__.__name__, e.message))
 
 def command_flush(parser, input_args):
     """Migrate all migrateable VMs off the given Node."""
@@ -227,10 +232,11 @@ def command_flush(parser, input_args):
     options = {'onlyha': args.onlyha}
     if 'count' in args and args.count:
         options['maxmigrations'] = args.count
-
-    newcluster = pvecluster.planflush(args.nodes, cluster.clone(), **options)
-
-    exec_migrate(cluster, newcluster, args)
+    try:
+        newcluster = pvecluster.planflush(args.nodes, cluster.clone(), **options)
+        exec_migrate(cluster, newcluster, args)
+    except Error as e:
+        print('{}: {} - Aborting'.format(e.__class__.__name__, e.message))
 
 def command_status(parser, input_args):
     """Print current cluster status."""

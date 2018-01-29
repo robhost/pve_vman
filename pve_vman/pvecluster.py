@@ -29,6 +29,7 @@ or balancing VMs across all nodes.
 import logging
 
 from pve_vman import pvestats
+from pve_vman.exceptions import InputError
 
 
 MAXMIGRATIONS = 150
@@ -83,7 +84,7 @@ def planflush(nodes, cluster, onlyha=False, maxmigrations=MAXMIGRATIONS):
 
     for node in nodes:
         if node not in cluster.keys():
-            raise Exception("node '{}' doesn't exist".format(node))
+            raise InputError("node '{}' doesn't exist".format(node))
 
         emptynodes.append(cluster[node])
 
