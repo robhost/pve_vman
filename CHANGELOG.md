@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.4.0] - 2018-01-29
+### Added
+- add custom exceptions and handling
+- add --ignore option to ignore some nodes as migration targets
+
+### Changed
+- fix parsing of vmiostat command to fix empty help message
+
 ## [0.3.0] - 2018-01-10
 ### Changed
 - split vmiostat into its own executable
