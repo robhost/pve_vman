@@ -51,9 +51,12 @@ def planbalance(cluster, iterations=MAXMIGRATIONS, diffperc=BALDIFFPERC):
     # until the memory percentage difference between the nodes is lower
     # than the break condition value. Prefer VMs that already have been
     # moved in order to minimize movement.
+
+    nodefilter = lambda n: n.isonline
+
     for _ in range(iterations):
-        highestnode = cluster.highestnode(attr, lambda n: n.isonline)
-        lowestnode = cluster.lowestnode(attr, lambda n: n.isonline)
+        highestnode = cluster.highestnode(attr, nodefilter)
+        lowestnode = cluster.lowestnode(attr, nodefilter)
 
         if diffperc > nodediff(attr, highestnode, lowestnode):
             break
