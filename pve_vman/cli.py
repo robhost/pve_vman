@@ -316,11 +316,6 @@ def vman():
 
 def vmiostat():
     """CLI main function for vmiostat utility."""
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(prog='vmiostat')
 
-    args, exceding_args = parser.parse_known_args()
-
-    progname = '{}'.format(parser.prog)
-    cmd_parser = argparse.ArgumentParser(prog=progname)
-
-    command_vmiostat(cmd_parser, exceding_args)
+    command_vmiostat(parser, sys.argv)
