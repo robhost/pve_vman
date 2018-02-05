@@ -337,4 +337,4 @@ def vmiostat():
     """CLI main function for vmiostat utility."""
     parser = argparse.ArgumentParser(prog='vmiostat')
 
-    command_vmiostat(parser, sys.argv)
+    command_vmiostat(parser, sys.argv[1:])
