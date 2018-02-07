@@ -172,7 +172,10 @@ def stats():
         keys = keys_by_prefix.get(prefix, [])
 
         for (key, conv), value in zip(keys, line_a):
-            stat[key] = conv(value) if value else conv()
+            if value and not (value == 'U' and conv is not str):
+                stat[key] = conv(value)
+            else:
+                stat[key] = conv()
 
         return stat
 
