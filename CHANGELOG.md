@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.4.2] - 2018-02-07
+### Changed
+- consider 'U' in rrd values as unknown value instead of trying to
+  convert it
+
 ## [0.4.1] - 2018-02-05
 ### Changed
 - fix calling vmiostat function which got the program name
