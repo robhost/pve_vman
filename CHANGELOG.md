@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.5.0] - 2018-02-08
+### Changed
+- migration don't run from or to a node consecutively anymore so when
+  limiting the number of migrations, it is more likely they will have
+  different source or target nodes
+
 ## [0.4.2] - 2018-02-07
 ### Changed
 - consider 'U' in rrd values as unknown value instead of trying to
