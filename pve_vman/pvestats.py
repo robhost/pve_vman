@@ -69,6 +69,9 @@ class PVEStatObject(object):
     def __lt__(self, other):
         return self.id < other.id
 
+    def __hash__(self):
+        return hash((self.idkey, self.id))
+
     @property
     def id(self):
         """Return the identifier value for this instance."""
@@ -248,6 +251,9 @@ class PVEMigration(object):
     def __repr__(self):
         fmt = 'Migration: {} from {} to {}'
         return fmt.format(self.pvevm, self.source, self.target)
+
+    def __hash__(self):
+        return hash((self.pvevm.id, self.source, self.target))
 
     @property
     def source(self):
