@@ -386,7 +386,8 @@ class PVEStatCluster(PVEStatContainer):
         """Return all migrations that are necessary to reach the target
         state of the cluster.
         """
-        return [m for n in self.nodes() for m in n.migrations()]
+        ordered = [m for n in self.nodes() for m in n.migrations()]
+        return sorted(ordered, key=hash)
 
 
 class PVEStatNode(PVEStatObject, PVEStatContainer):
@@ -469,7 +470,8 @@ class PVEStatNode(PVEStatObject, PVEStatContainer):
         """Return all migrations that are necessary to reach the target
         state of the cluster.
         """
-        return [vm.migration(self) for vm in self.moved_vms()]
+        ordered = [vm.migration(self) for vm in self.moved_vms()]
+        return sorted(ordered, key=hash)
 
 
 class PVEStatVM(PVEStatObject):
