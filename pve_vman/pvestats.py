@@ -446,11 +446,13 @@ class PVEStatNode(PVEStatObject, PVEStatContainer):
 
     def moved_vms(self):
         """Return list of VMs that have been moved to this node."""
-        return [vm for vm in self.vms() if vm.needsmove(self)]
+        ordered = [vm for vm in self.vms() if vm.needsmove(self)]
+        return sorted(ordered, key=hash)
 
     def migrateable_vms(self):
         """Return list of VMs that are migrateable."""
-        return self.vms(lambda c: c.migrateable)
+        ordered = self.vms(lambda c: c.migrateable)
+        return sorted(ordered, key=hash)
 
     def lowestvm(self, attr, filtermethod=None):
         """Return the VM with the lowest value of the the attribute
@@ -470,8 +472,7 @@ class PVEStatNode(PVEStatObject, PVEStatContainer):
         """Return all migrations that are necessary to reach the target
         state of the cluster.
         """
-        ordered = [vm.migration(self) for vm in self.moved_vms()]
-        return sorted(ordered, key=hash)
+        return [vm.migration(self) for vm in self.moved_vms()]
 
 
 class PVEStatVM(PVEStatObject):
