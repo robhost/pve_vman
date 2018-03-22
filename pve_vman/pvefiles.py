@@ -62,7 +62,8 @@ def storageconf():
         if not line_a:
             continue
 
-        key, value = line_a
+        key = line_a[0]
+        value = (' ').join(line_a[1:])
 
         if key.endswith(':'):
             current = conf[value] = {
@@ -198,7 +199,8 @@ def haconf():
         if not line_a:
             continue
 
-        key, value = line_a
+        key = line_a[0]
+        value = (' ').join(line_a[1:])
 
         if key.endswith(':'):
             current = conf[value] = {'name': value, 'type': key[:-1]}
