@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.5.1] - 2018-03-20
+### Changed
+- order vms considered for migration by hash as well
+
 ## [0.5.0] - 2018-02-08
 ### Changed
 - migration don't run from or to a node consecutively anymore so when

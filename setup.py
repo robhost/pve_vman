@@ -24,7 +24,7 @@ from textwrap import dedent
 
 setup(
     name="pve_vman",
-    version="0.5.0",
+    version="0.5.1",
     author="Tobias Böhm",
     author_email="tb@robhost.de",
     maintainer="Tobias Böhm",
