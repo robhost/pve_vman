@@ -25,3 +25,4 @@ to let the necessary commands run in order to achieve that state.
 
 
 from pve_vman import *
+from pve_vman._version import __version__

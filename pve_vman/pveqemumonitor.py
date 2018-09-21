@@ -87,6 +87,8 @@ class PVEQEMUMonitor(object):
             return ret['return']
         elif 'error' in ret:
             raise Exception(ret['error'])
+        else:
+            return None
 
     def human_cmd(self, cmd):
         """Return JSON decoded object of the answer following the given

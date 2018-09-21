@@ -205,8 +205,8 @@ def command_balance(parser, input_args):
     try:
         newcluster = pvecluster.planbalance(cluster.clone(), **options)
         exec_migrate(cluster, newcluster, args)
-    except Error as e:
-        print('{}: {} - Aborting'.format(e.__class__.__name__, e.message))
+    except Error as exc:
+        print('{}: {} - Aborting'.format(exc.__class__.__name__, exc.message))
 
 def command_flush(parser, input_args):
     """Migrate all migrateable VMs off the given Node."""
@@ -249,8 +249,8 @@ def command_flush(parser, input_args):
     try:
         newcluster = pvecluster.planflush(args.nodes, cluster.clone(), **options)
         exec_migrate(cluster, newcluster, args)
-    except Error as e:
-        print('{}: {} - Aborting'.format(e.__class__.__name__, e.message))
+    except Error as exc:
+        print('{}: {} - Aborting'.format(exc.__class__.__name__, exc.message))
 
 def command_status(parser, input_args):
     """Print current cluster status."""

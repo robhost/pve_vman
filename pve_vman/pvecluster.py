@@ -28,7 +28,6 @@ or balancing VMs across all nodes.
 
 import logging
 
-from pve_vman import pvestats
 from pve_vman.exceptions import InputError, PlanningError
 
 
@@ -37,11 +36,14 @@ BALDIFFPERC = 5
 
 
 def planbalance(cluster, iterations=MAXMIGRATIONS, diffperc=BALDIFFPERC,
-        ignorenodenames=[]):
+                ignorenodenames=None):
     """Migrate VMs in order to even the memory usage percentage on the
     nodes. The given cluster is changed.
     """
     _logger = logging.getLogger(__name__)
+
+    if ignorenodenames is None:
+        ignorenodenames = []
 
     def nodediff(diffattr, node1, node2):
         diff = getattr(node1, diffattr) - getattr(node2, diffattr)
@@ -91,13 +93,16 @@ def planbalance(cluster, iterations=MAXMIGRATIONS, diffperc=BALDIFFPERC,
     return cluster
 
 def planflush(nodes, cluster, onlyha=False, maxmigrations=MAXMIGRATIONS,
-        ignorenodenames=[]):
+              ignorenodenames=None):
     """Migrate all migratable VMs off the given nodes in order to empty
     it, e.g. for maintenance. The given cluster is changed.
     """
     emptynodes = []
     ignorenodes = []
     iterations = 0
+
+    if ignorenodenames is None:
+        ignorenodenames = []
 
     for node in nodes:
         if node not in cluster.keys():
