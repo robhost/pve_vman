@@ -56,6 +56,8 @@ class PVESH(object):
             cmd.append("-{}".format(option))
             cmd.append(str(value))
 
+        cmd += ["--output-format", "json-pretty"]
+
         return cmd
 
     @property
