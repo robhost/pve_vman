@@ -22,9 +22,11 @@
 from setuptools import setup, find_packages
 from textwrap import dedent
 
+from pve_vman._version import __version__
+
 setup(
     name="pve_vman",
-    version="0.5.2",
+    version=__version__,
     author="Tobias Böhm",
     author_email="tb@robhost.de",
     maintainer="Tobias Böhm",

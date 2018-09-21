@@ -33,6 +33,7 @@ import logging
 
 from pve_vman import pvestats, pvecluster, pvevmiostats
 from pve_vman.exceptions import Error, MigrationError
+from pve_vman._version import __version__
 
 logging.basicConfig(format='%(message)s')
 
@@ -296,6 +297,10 @@ def command_vmiostat(parser, input_args):
 
     print_vmiostat(**dict(args._get_kwargs()))
 
+def command_version(*_):
+    """Print version information of vman."""
+    print("vman %s" % __version__)
+
 
 def vman():
     """CLI main function for vman utility."""
@@ -317,6 +322,10 @@ def vman():
         'status',
         add_help=False,
         help='show the current cluster status')
+    subparsers.add_parser(
+        'version',
+        add_help=False,
+        help='print the version of pve_vman')
 
     args, exceding_args = parser.parse_known_args()
 
