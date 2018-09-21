@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.6.0] - 2018-09-21
+### Added
+- version subcommand
+
+### Changed
+- code style adjustments
+- adjust pvesh to API change in pve-manager 5.2-7, does not work with
+  older versions of pvesh
+
 ## [0.5.2] - 2018-03-22
 ### Changed
 - fix PVE files parser to handle values with spaces correctly
