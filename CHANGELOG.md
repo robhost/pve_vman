@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.7.0] - 2018-10-08
+### Added
+- nofail flag for migration subcommands: do not die if a migration exits
+  with error
+
 ## [0.6.0] - 2018-09-21
 ### Added
 - version subcommand
