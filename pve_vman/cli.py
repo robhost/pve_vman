@@ -130,8 +130,12 @@ def exec_migrate(cluster, newcluster, args):
         _logger.debug(out.stdout)
 
         if out.returncode != 0:
-            raise MigrationError(
-                'migration returncode not 0: {}'.format(out.returncode))
+            msg = 'migration returncode not 0: {}'.format(out.returncode)
+
+            if args.nofail:
+                _logger.warn(msg)
+            else:
+                raise MigrationError(msg)
 
 def print_vmiostat(interval=1, count=0, limit=0, totals=False, ssum=False):
     """Print the throughput per VM. Default is to print a line per VM
@@ -190,6 +194,10 @@ def command_balance(parser, input_args):
         '-i', '--ignore',
         type=lambda x: x.split(','),
         help='comma separated list of nodes to ignore as migration targets')
+    parser.add_argument(
+        '-f', '--nofail',
+        action='store_true',
+        help="do not fail if a migration's exit code is not 0")
 
     args = parser.parse_args(input_args)
 
@@ -230,6 +238,10 @@ def command_flush(parser, input_args):
         '-i', '--ignore',
         type=lambda x: x.split(','),
         help='comma separated list of nodes to ignore as migration targets')
+    parser.add_argument(
+        '-f', '--nofail',
+        action='store_true',
+        help="do not fail if a migration's exit code is not 0")
     parser.add_argument(
         'nodes',
         nargs='+',
