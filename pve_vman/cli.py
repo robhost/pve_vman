@@ -351,11 +351,23 @@ def vman():
     funcname = 'command_{}'.format(args.command)
     func = globals()[funcname]
 
+    def signal_handler(*_):
+        print()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
+
     func(cmd_parser, exceding_args)
 
 
 def vmiostat():
     """CLI main function for vmiostat utility."""
     parser = argparse.ArgumentParser(prog='vmiostat')
+
+    def signal_handler(*_):
+        print()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
 
     command_vmiostat(parser, sys.argv[1:])
