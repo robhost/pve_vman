@@ -37,7 +37,7 @@ class VMIOStats(object):
     def new_statdict():
         return  dict(zip(VMIOStats.keys, (0, 0, 0, 0)))
 
-    def __init__(self, interval, pathglob='/run/qemu-server/*.qmp'):
+    def __init__(self, interval, pathglob='/run/qemu-server/[0-9]*[0-9].qmp'):
         self.interval = interval
         self.pathglob = pathglob
         self.vmstats = {}
