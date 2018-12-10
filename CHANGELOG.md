@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.7.2] - 2018-12-10
+### Changed
+- restrict qmp socket glob for vmiostat as the assumption of only one
+  qmp per VM broke with qemu-server 5.0-41 which introduxes  qmeventd
+
 ## [0.7.1] - 2018-11-19
 ### Added
 - signal handler for sigint in CLI entry points
