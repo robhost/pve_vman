@@ -525,6 +525,10 @@ def buildcluster():
 
     for res in resources['vm']:
         vmid = res['vmid']
+
+        if vmid not in vmconf:
+            continue
+
         nodeid = vmconf[vmid]['node']
         haresource = haresources.get(vmid, {})
 
