@@ -30,7 +30,11 @@ def readpvefile(pvefilepath):
     PVE config directory.
     """
     fullpath = os.path.join(BASEPATH, pvefilepath)
-    return _readfile(fullpath)
+
+    if os.path.exists(fullpath):
+        return _readfile(fullpath)
+    else:
+        return []
 
 def storageconf():
     """Return dictionary of the PVE cluster storage configuration."""
