@@ -520,10 +520,10 @@ def buildcluster():
     haresources = pvefiles.haconf()
     cluster = PVEStatCluster()
 
-    for node in resources['node']:
+    for node in resources.get('node', []):
         cluster.add(PVEStatNode(**node))
 
-    for res in resources['vm']:
+    for res in resources.get('vm', []):
         vmid = res['vmid']
 
         if vmid not in vmconf:
