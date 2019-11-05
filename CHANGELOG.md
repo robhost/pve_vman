@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.7.3] - 2019-11-05
+### Changed
+- check resources dict for keys when accessing
+- check pve file existence before reading file
+- skip vm if found in resources but no config available instead of
+  failing
+
 ## [0.7.2] - 2018-12-10
 ### Changed
 - restrict qmp socket glob for vmiostat as the assumption of only one
